@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>防抖节流函数</title>
+</head>
+<body>
+  一般情况：<input type="text" class="normal"><br />
+  防抖后的：<input type="text" class="debounce"><br />
+  节流后的：<input type="text" class="throttle"><br>
+  <span class="result"></span>
+</body>
+<script>
+  // 模拟一段ajax请求
+  function ajax(content) {
+    document.querySelector('.result').innerHTML = content;
+  }
+
+  var inputa = document.querySelector('.normal');
+  var inputb = document.querySelector('.debounce');
+  var inputc = document.querySelector('.throttle');
+
+  // 一般情况
+  inputa.addEventListener('keyup', function (e) {
+      ajax(e.target.value)
+  })
+  // 防抖
+  var debFn = debounceFn(ajax, 500);
+  inputb.addEventListener('keyup', function(e) {
+    debFn(e.target.value);
+  });
+  function debounceFn(fn, delay) {
+    var timer = null;
+    return function() {
+      var content = this,
+          arg = arguments;
+      // 先清除定时器
+      clearTimeout(timer);
+      timer = setTimeout(function() {
+        fn.apply(content, arg);
+      }, delay);
+    }
+  };
+
+  // 节流
+  var throFn = throttleFn(ajax, 500);
+  inputc.addEventListener('keyup', function(e) {
+    throFn(e.target.value);
+  });
+  function throttleFn(fn, delay) {
+    var prev = +new Date();
+    return function() {
+      var content = this,
+          arg = arguments;
+      var now = +new Date();
+      if(now - prev >= delay) {
+        fn.apply(content, arg);
+        prev = +new Date();
+      }
+    }
+  }
+  // debounce
+  //   search搜索联想，用户在不断输入值时，用防抖来节约请求资源。
+  //   window触发resize的时候，不断的调整浏览器窗口大小会不断的触发这个事件，用防抖来让其只触发一次
+  // throttle
+  //   鼠标不断点击触发，mousedown(单位时间内只触发一次)
+  //   监听滚动事件，比如是否滑到底部自动加载更多，用throttle来判断
+
+
+</script>
+</html>
